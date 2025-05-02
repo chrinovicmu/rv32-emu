@@ -1,13 +1,34 @@
 #include "../includes/dram.h"
-#include <cstdint>
-#include <stdint.h>
 #include <stdio.h>
 
-uint64_t dram_load_32(DRAM *dram, uint64_t addr)
+uint64_t dram_load_8(DRAM *dram, uint64_t addr)
+{
+    uint64_t base_offset = addr - DRAM_BASE;
+    uint64_t value = 0; 
+    value |= dram->mem[base_offset];
+
+    return value;
+}
+
+uint64_t dram_load_16(DRAM *dram, uint64_t addr)
+{
+    uint64_t base_offset = addr - DRAM_BASE;
+
+    uint8_t byte0 = dram->mem[base_offset]; 
+    uint8_t byte1 = dram->mem[base_offset + 1]; 
+
+    uint64_t value = 0; 
+    value |= (uint64_t)byte0; 
+    value |= (uint64_t)byte1 << 8; 
+
+    return value; 
+
+}
+
+uint64_t dram_load_32(DRAM * dram, uint64_t addr)
 {
     uint64_t base_offset = addr - DRAM_BASE; 
 
-    /*read indiviadual bytes from memory */ 
     uint8_t byte0 = dram->mem[base_offset];
     uint8_t byte1 = dram->mem[base_offset + 1];
     uint8_t byte2 = dram->mem[base_offset + 2]; 
@@ -22,7 +43,7 @@ uint64_t dram_load_32(DRAM *dram, uint64_t addr)
     return value; 
 }
 
-uint64_t dram_load_64(DRAM *dram, uint64_t addr)
+uint64_t dram_load_64(DRAM * dram, uint64_t addr)
 {
     uint64_t base_offset = addr - DRAM_BASE; 
 
@@ -49,7 +70,13 @@ uint64_t dram_load_64(DRAM *dram, uint64_t addr)
     return value;
 }
 
-void dram_store_16(DRAM *dram, uint64_t addr, uint64_t value)
+void dram_store_8(DRAM * dram, uint64_t addr, uint64_t value)
+{
+    uint64_t base_offset = addr - DRAM_BASE; 
+    dram->mem[base_offset] = (uint8_t)(value & 0xFF); 
+}
+
+void dram_store_16(DRAM * dram, uint64_t addr, uint64_t value)
 {
     uint64_t base_offset = addr - DRAM_BASE; 
 
@@ -57,7 +84,16 @@ void dram_store_16(DRAM *dram, uint64_t addr, uint64_t value)
     dram->mem[base_offset + 1] = (uint8_t) ((value >> 8) & 0xFF); 
 }
 
-void dram_store_64(DRAM *dram, uint64_t addr, uint64_t value)
+void dram_store_32(DRAM * dram, uint64_t addr, uint64_t value)
+{
+    uint64_t base_offset = addr - DRAM_BASE; 
+
+    dram->mem[base_offset] = (uint8_t)(value & 0xFF); 
+    dram->mem[base_offset + 1] = (uint8_t)((value >> 8)  & 0xFF); 
+    dram->mem[base_offset + 2] = (uint8_t)((value >> 16) & 0xFF); 
+    dram->mem[base_offset + 3] = (uint8_t)((value >> 24) & 0xFF); 
+}
+void dram_store_64(DRAM * dram, uint64_t addr, uint64_t value)
 {
     uint64_t base_offset = addr = DRAM_BASE; 
 
@@ -71,7 +107,7 @@ void dram_store_64(DRAM *dram, uint64_t addr, uint64_t value)
     dram->mem[base_offset + 7] = (uint8_t)((value >> 56) & 0xFF); 
 }
 
-uint64_t dram_load(DRAM* dram, uint64_t addr, uint64_t size)
+uint64_t dram_load(DRAM * dram, uint64_t addr, uint64_t size)
 {
     switch (size)
     {
@@ -90,7 +126,7 @@ uint64_t dram_load(DRAM* dram, uint64_t addr, uint64_t size)
     return 1; 
 }
 
-void dram_store(DRAM *dram, uint64_t addr, uint64_t size, uint64_t value)
+void dram_store(DRAM * dram, uint64_t addr, uint64_t size, uint64_t value)
 {
     switch (size)
     {
