@@ -1,5 +1,4 @@
 #include "../includes/dram.h"
-#include <stdio.h>
 
 uint64_t dram_load_8(DRAM *dram, uint64_t addr)
 {
